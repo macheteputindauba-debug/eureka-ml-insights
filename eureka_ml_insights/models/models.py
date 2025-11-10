@@ -966,8 +966,11 @@ class HuggingFaceModel(Model):
     max_tokens: int = 2000
     temperature: float = 0.001
     top_p: float = 0.95
+    top_k: int = 20
     do_sample: bool = True
     apply_model_template: bool = True
+    repetition_penalty: float = 1.0
+    presence_penalty: float = 0.0
 
     quantize: bool = False
     use_flash_attn: bool = False
@@ -1238,6 +1241,17 @@ class LLaVAHuggingFaceModel(HuggingFaceModel):
 class Qwen3VLHFModel(HuggingFaceModel):
     """This class is used to run a self-hosted Qwen3VL model via HuggingFace apis."""
 
+    max_tokens: int = 32768
+    temperature: float = 0.7
+    top_p: float = 0.8
+    top_k: int = 20
+    do_sample: bool = True
+    repetition_penalty: float = 1.0
+    presence_penalty: float = 1.5
+    seed: int = 3407
+
+    use_flash_attn: bool = True
+
     def __post_init__(self):
         super().__post_init__()
         if "Qwen3-VL" not in self.model_name:
@@ -1279,6 +1293,8 @@ class Qwen3VLHFModel(HuggingFaceModel):
             max_new_tokens=self.max_tokens,
             temperature=self.temperature,
             top_p=self.top_p,
+            top_k=self.top_k,
+            repetition_penalty=self.repetition_penalty,
             do_sample=self.do_sample,
         )
         end_time = time.time()

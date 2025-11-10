@@ -285,10 +285,6 @@ QWEN3_VL_4B_INSTRUCT_HF_CONFIG = ModelConfig(
     Qwen3VLHFModel,
     {
         "model_name": "Qwen/Qwen3-VL-4B-Instruct",
-        "max_tokens": 768,
-        "use_flash_attn": True,
-        "do_sample": False,
-        "top_p": None
     },
 )
 
@@ -296,10 +292,6 @@ QWEN3_VL_8B_INSTRUCT_HF_CONFIG = ModelConfig(
     Qwen3VLHFModel,
     {
         "model_name": "Qwen/Qwen3-VL-8B-Instruct",
-        "max_tokens": 768,
-        "use_flash_attn": True,
-        "do_sample": False,
-        "top_p": None
     },
 )
 

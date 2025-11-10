@@ -1,3 +1,4 @@
+from enum import Enum
 from tqdm.auto import tqdm
 
 
@@ -194,10 +195,15 @@ class MetricBasedVerifier:
 class BboxMetric(Metric):
     """This class is a base class for metrics that require ground truths and predictions."""
 
-    def __init__(self, model_output_col: str = "model_output", normalized: bool = False, xywh: bool = True):
+    class NormalizeMode(Enum):
+        NORMALIZED = 1
+        UNNORMALIZED = 2
+        NORMALIZED_1000 = 3
+
+    def __init__(self, model_output_col: str = "model_output", normalize_mode: NormalizeMode = NormalizeMode.NORMALIZED, xywh: bool = True):
         super().__init__()
         self.model_output_col = model_output_col
-        self.normalized = normalized
+        self.normalize_mode = normalize_mode
         self.xywh = xywh
 
     def validate_data(self, data):
@@ -213,6 +219,9 @@ class BboxMetric(Metric):
         if not is_valid or not bbox_answer:
             return "none"
         
+        if self.normalize_mode == BboxMetric.NormalizeMode.NORMALIZED_1000:
+            bbox_answer = [coord / 1000.0 for coord in bbox_answer]
+
         if self.xywh:
             bbox = [bbox[0], bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]]
         else:
@@ -229,6 +238,6 @@ class BboxMetric(Metric):
     def evaluate(self, data):
         self.validate_data(data)
         data[self.__class__.__name__ + "_result"] = data.apply(
-            lambda x: self.__evaluate__(x[self.model_output_col], x["bbox_normalized"] if self.normalized else x["bbox"], x["is_valid"]), axis=1
+            lambda x: self.__evaluate__(x[self.model_output_col], x["bbox_normalized"] if (self.normalize_mode != BboxMetric.NormalizeMode.UNNORMALIZED) else x["bbox"], x["is_valid"]), axis=1
         )
         return data    
