@@ -1093,6 +1093,112 @@ class HuggingFaceModel(Model):
     def model_template_fn(self, text_prompt, system_message=None, num_images=None):
         return system_message + " " + text_prompt if system_message else text_prompt
 
+@dataclass
+class HuggingFaceModelMM(HuggingFaceModel):
+    """This class is used to run a self-hosted LLaVA model via HuggingFace apis."""
+
+    def get_model(self):
+        import torch
+        from transformers import AutoModelForCausalLM, AutoProcessor
+
+        quantization_config = None
+        if self.quantize:
+            from transformers import BitsAndBytesConfig
+
+            logging.info("Quantizing model")
+            # specify how to quantize the model
+            quantization_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.float16,
+            )
+
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.model_name,
+            torch_dtype=torch.float16,
+            quantization_config=quantization_config,
+            device_map=self.device,
+            use_flash_attention_2=self.use_flash_attn,
+            trust_remote_code=True,
+        )
+
+        self.processor = AutoProcessor.from_pretrained(self.model_name, trust_remote_code=True)
+
+
+
+    def _generate(self, text_prompt, query_images=None):
+        inputs = self.processor(text=text_prompt, images=query_images, return_tensors="pt").to(self.device)
+        
+        # import sys  
+        # sys.path.insert(0, self.model_name)
+
+        # from processing_bunny_phi4 import tokenizer_image_token, process_images
+
+        # # Tokenize with image token handling
+        # input_ids = tokenizer_image_token(text_prompt, self.processor.tokenizer, return_tensors='pt').unsqueeze(0).to("cuda:0")
+
+        # # Process image
+        # images = process_images(query_images, self.processor.image_processor, self.model.config)
+        # images = {k: v.to("cuda:0", torch.bfloat16) if v.is_floating_point() else v.to("cuda:0") for k, v in images.items()}
+
+        start_time = time.time()
+        try:
+            output_ids = self.model.generate(
+                **inputs,
+                max_new_tokens=self.max_tokens,
+                temperature=self.temperature,
+                top_p=self.top_p,
+                do_sample=self.do_sample,
+            )
+        except Exception as e:
+            logging.warning(e)
+            return None
+                    
+        end_time = time.time()
+        sequence_length = inputs["input_ids"].shape[1]
+        new_output_ids = output_ids[:, sequence_length:]
+        model_output = self.processor.batch_decode(
+            new_output_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False
+        )[0]
+
+        response_time = end_time - start_time
+        return {
+            "model_output": model_output,
+            "response_time": response_time,
+        }
+
+def model_template_fn(self, text_prompt, system_message=None, num_images=None):
+
+        image_messages = [
+            {
+                "type": "image",
+                "image": f"image{i}",
+            } for i in range(num_images)
+        ]
+        content = image_messages + [{"type": "text", "text": text_prompt}]
+
+        messages = []
+        if system_message:
+            messages.append(
+                {
+                    "role": "system", 
+                    "content": system_message,
+                }
+            )
+        messages.append(
+            {
+                "role": "user", 
+                "content": content,
+            }
+        )
+
+        text_prompt = self.processor.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+            return_dict=False,
+        )
+
+        return text_prompt
 
 @dataclass
 class Phi3HFModel(HuggingFaceModel):
@@ -1241,16 +1347,21 @@ class LLaVAHuggingFaceModel(HuggingFaceModel):
 class Qwen3VLHFModel(HuggingFaceModel):
     """This class is used to run a self-hosted Qwen3VL model via HuggingFace apis."""
 
-    max_tokens: int = 32768
-    temperature: float = 0.7
-    top_p: float = 0.8
-    top_k: int = 20
-    do_sample: bool = True
-    repetition_penalty: float = 1.0
-    presence_penalty: float = 1.5
-    seed: int = 3407
+    # max_tokens: int = 1024
+    # temperature: float = 0.7
+    # top_p: float = 0.8
+    # top_k: int = 20
+    # do_sample: bool = True
+    # repetition_penalty: float = 1.0
+    # presence_penalty: float = 1.5
+    # seed: int = 3407
 
-    use_flash_attn: bool = True
+    # use_flash_attn: bool = True
+    
+    temperature = 0.0
+    max_tokens = 1024
+    use_flash_attn = True
+    do_sample = False    
 
     def __post_init__(self):
         super().__post_init__()

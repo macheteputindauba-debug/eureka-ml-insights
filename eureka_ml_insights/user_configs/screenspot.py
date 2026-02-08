@@ -68,7 +68,6 @@ class SCREENSPOT_NORMALIZED_PIPELINE(ExperimentConfig):
             ),
             output_dir=os.path.join(self.log_dir, "inference_result"),
             resume_from=resume_from,
-            max_concurrent=20,
         )
 
         self.evalreporting_comp = EvalReportingConfig(
@@ -118,9 +117,21 @@ class SCREENSPOT_NORMALIZED_1000_PIPELINE(SCREENSPOT_NORMALIZED_PIPELINE):
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
         config = super().configure_pipeline(model_config, resume_from)
-        self.data_processing_comp.prompt_template_path = os.path.join(os.path.dirname(__file__), "../prompt_templates/screenspot_templates/normalized_1000.jinja"            )
+        self.data_processing_comp.prompt_template_path = os.path.join(os.path.dirname(__file__), "../prompt_templates/screenspot_templates/plain.jinja"            )
         self.evalreporting_comp.metric_config = MetricConfig(BboxMetric, {"normalize_mode": BboxMetric.NormalizeMode.NORMALIZED_1000})
         return config
+
+class SCREENSPOT_NORMALIZED_1024_PIPELINE(SCREENSPOT_NORMALIZED_PIPELINE):
+    """
+    This defines an ExperimentConfig pipeline for the SCREENSPOT dataset using normalized 0-1000 coordinates.
+    There is no model_config by default and the model config must be passed in via command line.
+    """
+
+    def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.prompt_template_path = os.path.join(os.path.dirname(__file__), "../prompt_templates/screenspot_templates/plain.jinja"            )
+        self.evalreporting_comp.metric_config = MetricConfig(BboxMetric, {"normalize_mode": BboxMetric.NormalizeMode.NORMALIZED_1024})
+        return config        
 
 class SCREENSPOT_UNNORMALIZED_PIPELINE(SCREENSPOT_NORMALIZED_PIPELINE):
     """
@@ -157,6 +168,18 @@ class SCREENSPOTV2_NORMALIZED_1000_PIPELINE(SCREENSPOT_NORMALIZED_1000_PIPELINE)
         self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/screenspot_all_v2.jsonl"
         self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/images_v2"
         return config
+
+class SCREENSPOTV2_NORMALIZED_1024_PIPELINE(SCREENSPOT_NORMALIZED_1024_PIPELINE):
+    """
+    This defines an ExperimentConfig pipeline for the SCREENSPOTV2 dataset using normalized 0-1000 coordinates.
+    There is no model_config by default and the model config must be passed in via command line.
+    """
+
+    def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/screenspot_all_v2.jsonl"
+        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/images_v2"
+        return config        
 
 class SCREENSPOTV2_UNNORMALIZED_PIPELINE(SCREENSPOT_UNNORMALIZED_PIPELINE):
     """
@@ -196,6 +219,19 @@ class SCREENSPOT_PRO_NORMALIZED_1000_PIPELINE(SCREENSPOT_NORMALIZED_1000_PIPELIN
         self.evalreporting_comp.metric_config = MetricConfig(BboxMetric, {"normalize_mode": BboxMetric.NormalizeMode.NORMALIZED_1000, "xywh": False})
         return config        
     
+class SCREENSPOT_PRO_NORMALIZED_1024_PIPELINE(SCREENSPOT_NORMALIZED_1024_PIPELINE):
+    """
+    This defines an ExperimentConfig pipeline for the SCREENSPOT_PRO dataset using normalized coordinates.
+    There is no model_config by default and the model config must be passed in via command line.
+    """
+
+    def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/screenspot_pro_all.jsonl"
+        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/images"
+        self.evalreporting_comp.metric_config = MetricConfig(BboxMetric, {"normalize_mode": BboxMetric.NormalizeMode.NORMALIZED_1024, "xywh": False})
+        return config    
+
 class SCREENSPOT_PRO_UNNORMALIZED_PIPELINE(SCREENSPOT_UNNORMALIZED_PIPELINE):
     """
     This defines an ExperimentConfig pipeline for the SCREENSPOT_PRO dataset using unnormalized coordinates.

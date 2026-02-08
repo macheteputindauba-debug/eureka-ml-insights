@@ -10,6 +10,7 @@ from eureka_ml_insights.data_utils import (
     DataLoader,
     DataReader,
     SequenceTransform,
+    SamplerTransform,
     ColumnRename,
     AddColumn,
 )
@@ -54,6 +55,8 @@ class VSTAR_BENCH_PIPELINE(ExperimentConfig):
         # Get the user provided LLM judge configuration, defaulting to PERSONAL_GPT4O if not provided.
         LLM_JUDGE_CONFIG = kwargs.get("llm_judge_config", PERSONAL_GPT4O)
 
+        print(LLM_JUDGE_CONFIG)
+
         # Download V*Bench from HuggingFace
         self.data_processing_comp = PromptProcessingConfig(
             component_type=PromptProcessing,
@@ -62,6 +65,7 @@ class VSTAR_BENCH_PIPELINE(ExperimentConfig):
                 {
                     "path": "tmlabonte/vstar_bench",
                     "split": "test",
+                    #"transform": SamplerTransform(sample_count=10, random_seed=42),
                 },
             ),
             output_dir=os.path.join(self.log_dir, "data_processing_output"),
@@ -78,8 +82,7 @@ class VSTAR_BENCH_PIPELINE(ExperimentConfig):
                 },
             ),
             output_dir=os.path.join(self.log_dir, "inference_result"),
-            resume_from=resume_from,
-            max_concurrent=8,
+            resume_from=resume_from, 
         )
 
         # Prepare inference result for LLM answer extraction

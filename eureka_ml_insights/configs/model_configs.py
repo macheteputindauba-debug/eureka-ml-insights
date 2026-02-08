@@ -360,6 +360,30 @@ QWQ32B_LOCAL_CONFIG = ModelConfig(
     },
 )
 
+GEMMA3_12B_IT_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "google/gemma-3-12b-it",
+        # specify ports in case the model is already deployed
+        "ports": ["8009"],
+        "max_concurrent": 1,
+        "max_tokens": 1024,
+    },
+)
+
+KIMIVL_3B_IT_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "moonshotai/Kimi-VL-A3B-Instruct",
+        # specify ports in case the model is already deployed
+        "ports": ["8009"],
+        "max_concurrent": 1,
+        "max_tokens": 1024,
+    },
+)
+
 # DeepSeek R1 Endpoints on Azure
 DEEPSEEK_R1_CONFIG = ModelConfig(
     DeepseekR1ServerlessAzureRestEndpointModel,

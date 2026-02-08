@@ -199,6 +199,7 @@ class BboxMetric(Metric):
         NORMALIZED = 1
         UNNORMALIZED = 2
         NORMALIZED_1000 = 3
+        NORMALIZED_1024 = 3
 
     def __init__(self, model_output_col: str = "model_output", normalize_mode: NormalizeMode = NormalizeMode.NORMALIZED, xywh: bool = True):
         super().__init__()
@@ -221,7 +222,8 @@ class BboxMetric(Metric):
         
         if self.normalize_mode == BboxMetric.NormalizeMode.NORMALIZED_1000:
             bbox_answer = [coord / 1000.0 for coord in bbox_answer]
-
+        elif self.normalize_mode == BboxMetric.NormalizeMode.NORMALIZED_1024:
+            bbox_answer = [coord / 1024.0 for coord in bbox_answer]
         if self.xywh:
             bbox = [bbox[0], bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]]
         else:
