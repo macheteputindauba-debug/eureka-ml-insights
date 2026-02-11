@@ -5,6 +5,7 @@ from .aime import (
     AIME_PIPELINE,
 )
 from .aime_seq import AIME_SEQ_PIPELINE
+from .chartqa import CHARTQA_PIPELINE
 from .ba_calendar import (
     BA_Calendar_Parallel_PIPELINE,
     BA_Calendar_PIPELINE,
@@ -221,6 +222,7 @@ __all__ = [
     FLICKR30K_PIPELINE,
     NOCAPS_PIPELINE,
     VSTAR_BENCH_PIPELINE,
-    MUIRBENCH_BASELINE_PIPELINE, 
-    MMIU_BASELINE_PIPELINE,    
+    MUIRBENCH_BASELINE_PIPELINE,
+    MMIU_BASELINE_PIPELINE,
+    CHARTQA_PIPELINE,
 ]

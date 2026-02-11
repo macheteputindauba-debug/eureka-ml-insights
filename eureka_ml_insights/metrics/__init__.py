@@ -1,3 +1,4 @@
+from .chartqa_metrics import ChartQARelaxedAccuracyMetric
 from .f1score_metrics import MaxTokenF1ScoreMetric
 from .geomtric_reasoning_metrics import GeoMCQMetric
 from .metrics_base import (
@@ -36,6 +37,7 @@ from .spatial_and_layout_metrics import (
 __all__ = [
     Metric,
     ClassicMetric,
+    ChartQARelaxedAccuracyMetric,
     CompositeMetric,
     SpatialAndLayoutReasoningMetric,
     ObjectRecognitionMetric,
