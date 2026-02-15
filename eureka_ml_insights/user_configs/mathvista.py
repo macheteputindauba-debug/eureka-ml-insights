@@ -20,6 +20,7 @@ from eureka_ml_insights.data_utils import (
     SamplerTransform,
     SequenceTransform,
     SelectTransform,
+    MultiplyTransform,
 )
 
 from eureka_ml_insights.configs import(
@@ -62,6 +63,7 @@ class MATHVISTA_PIPELINE(ExperimentConfig):
                             MapStringsTransform(columns="task", mapping=lambda d: d["task"]),
                             #SamplerTransform(sample_count=32, random_seed=1234),
                             ImputeNA(columns=["choices", "precision", "unit"], value=""),
+                            MultiplyTransform(3),
                         ]
                     ),
                 },

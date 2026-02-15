@@ -13,6 +13,7 @@ from eureka_ml_insights.data_utils import (
     SamplerTransform,
     ColumnRename,
     AddColumn,
+    MultiplyTransform,
 )
 from eureka_ml_insights.metrics import CountAggregator, SubstringExistsMatch
 
@@ -66,6 +67,7 @@ class VSTAR_BENCH_PIPELINE(ExperimentConfig):
                     "path": "tmlabonte/vstar_bench",
                     "split": "test",
                     #"transform": SamplerTransform(sample_count=10, random_seed=42),
+                    "transform": MultiplyTransform(3),
                 },
             ),
             output_dir=os.path.join(self.log_dir, "data_processing_output"),
@@ -85,43 +87,43 @@ class VSTAR_BENCH_PIPELINE(ExperimentConfig):
             resume_from=resume_from, 
         )
 
-        # # Prepare inference result for LLM answer extraction
-        # self.preeval_data_post_processing_comp = PromptProcessingConfig(
-        #     component_type=PromptProcessing,
-        #     data_reader_config=DataSetConfig(
-        #         DataReader,
-        #         {
-        #             "path": os.path.join(self.inference_comp.output_dir, "inference_result.jsonl"),
-        #             "format": ".jsonl",
-        #             "transform": SequenceTransform(
-        #                 [
-        #                     ColumnRename(name_mapping={
-        #                         "prompt": "initial_prompt",
-        #                         "model_output": "model_output_raw",
-        #                     }),
-        #                     AddColumn(column_name="prompt"),
-        #                 ]
-        #             ),
-        #         },
-        #     ),
-        #     prompt_template_path=os.path.join(
-        #         os.path.dirname(__file__),
-        #         "../prompt_templates/vstar_bench_templates/extract_answer.jinja",
-        #     ),
-        #     output_dir=os.path.join(self.log_dir, "preeval_data_post_processing_output"),
-        # )
+        # Prepare inference result for LLM answer extraction
+        self.preeval_data_post_processing_comp = PromptProcessingConfig(
+            component_type=PromptProcessing,
+            data_reader_config=DataSetConfig(
+                DataReader,
+                {
+                    "path": os.path.join(self.inference_comp.output_dir, "inference_result.jsonl"),
+                    "format": ".jsonl",
+                    "transform": SequenceTransform(
+                        [
+                            ColumnRename(name_mapping={
+                                "prompt": "initial_prompt",
+                                "model_output": "model_output_raw",
+                            }),
+                            AddColumn(column_name="prompt"),
+                        ]
+                    ),
+                },
+            ),
+            prompt_template_path=os.path.join(
+                os.path.dirname(__file__),
+                "../prompt_templates/vstar_bench_templates/extract_answer.jinja",
+            ),
+            output_dir=os.path.join(self.log_dir, "preeval_data_post_processing_output"),
+        )
 
-        # # Extract answer using LLM
-        # self.llm_answer_extract_comp = InferenceConfig(
-        #     component_type=Inference,
-        #     model_config=LLM_JUDGE_CONFIG,
-        #     data_loader_config=DataSetConfig(
-        #         DataLoader,
-        #         {"path": os.path.join(self.preeval_data_post_processing_comp.output_dir, "transformed_data.jsonl")},
-        #     ),
-        #     output_dir=os.path.join(self.log_dir, "llm_answer_extract_inference_result"),
-        #     max_concurrent=8,
-        # )
+        # Extract answer using LLM
+        self.llm_answer_extract_comp = InferenceConfig(
+            component_type=Inference,
+            model_config=LLM_JUDGE_CONFIG,
+            data_loader_config=DataSetConfig(
+                DataLoader,
+                {"path": os.path.join(self.preeval_data_post_processing_comp.output_dir, "transformed_data.jsonl")},
+            ),
+            output_dir=os.path.join(self.log_dir, "llm_answer_extract_inference_result"),
+            max_concurrent=8,
+        )
 
         # Evaluate extracted answer
         self.evalreporting_comp = EvalReportingConfig(
@@ -129,7 +131,7 @@ class VSTAR_BENCH_PIPELINE(ExperimentConfig):
             data_reader_config=DataSetConfig(
                 DataReader,
                 {
-                    "path": os.path.join(self.inference_comp.output_dir, "inference_result.jsonl"),
+                    "path": os.path.join(self.llm_answer_extract_comp.output_dir, "inference_result.jsonl"),
                     "format": ".jsonl",
                 },
             ),
@@ -151,8 +153,8 @@ class VSTAR_BENCH_PIPELINE(ExperimentConfig):
             [
                 self.data_processing_comp,
                 self.inference_comp,
-                # self.preeval_data_post_processing_comp,
-                # self.llm_answer_extract_comp,
+                self.preeval_data_post_processing_comp,
+                self.llm_answer_extract_comp,
                 self.evalreporting_comp,
             ],
             self.log_dir,

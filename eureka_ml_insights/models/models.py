@@ -557,15 +557,25 @@ class OpenAICommonRequestResponseMixIn:
         user_content = text_prompt
         if query_images:
             encoded_images = self.base64encode(query_images)
+
+            image_content = []
+
+            for encoded_image in encoded_images:
+                image_content.append(
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/png;base64,{encoded_image}",
+                        },
+                    }
+                )
+
             user_content = [
                 {"type": "text", "text": text_prompt},
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/png;base64,{encoded_images[0]}",
-                    },
-                },
             ]
+
+            user_content += (image_content)
+
         messages.append({"role": "user", "content": user_content})
         request_body = {"messages": messages}
         for kwarg in {"extra_body"}:
@@ -1123,23 +1133,9 @@ class HuggingFaceModelMM(HuggingFaceModel):
 
         self.processor = AutoProcessor.from_pretrained(self.model_name, trust_remote_code=True)
 
-
-
     def _generate(self, text_prompt, query_images=None):
         inputs = self.processor(text=text_prompt, images=query_images, return_tensors="pt").to(self.device)
         
-        # import sys  
-        # sys.path.insert(0, self.model_name)
-
-        # from processing_bunny_phi4 import tokenizer_image_token, process_images
-
-        # # Tokenize with image token handling
-        # input_ids = tokenizer_image_token(text_prompt, self.processor.tokenizer, return_tensors='pt').unsqueeze(0).to("cuda:0")
-
-        # # Process image
-        # images = process_images(query_images, self.processor.image_processor, self.model.config)
-        # images = {k: v.to("cuda:0", torch.bfloat16) if v.is_floating_point() else v.to("cuda:0") for k, v in images.items()}
-
         start_time = time.time()
         try:
             output_ids = self.model.generate(
@@ -1166,15 +1162,40 @@ class HuggingFaceModelMM(HuggingFaceModel):
             "response_time": response_time,
         }
 
-def model_template_fn(self, text_prompt, system_message=None, num_images=None):
+    def check_and_add_image_token(self, text_prompt, num_images):
+        import re
+        from bunny.constants import DEFAULT_IMAGE_TOKEN
 
-        image_messages = [
-            {
-                "type": "image",
-                "image": f"image{i}",
-            } for i in range(num_images)
-        ]
-        content = image_messages + [{"type": "text", "text": text_prompt}]
+        text_prompt_orig = text_prompt
+
+        # first do a simple formal change, as some bechmarks have the number in the tag
+        matches = re.findall(r"<image (\d+)>", text_prompt)
+
+        if matches:
+            for match in matches:
+                text_prompt = text_prompt.replace(f"<image {match}>", DEFAULT_IMAGE_TOKEN, 1)
+
+        # now count the number of image tokens
+        matches = re.findall(DEFAULT_IMAGE_TOKEN, text_prompt)
+        num_image_tokens = len(matches)
+
+        #if there is a mismatch with the number of images, we remove and re add them
+        if num_image_tokens != num_images:
+            # remove all image tokens
+            if matches:
+                for match in matches:
+                    text_prompt = text_prompt.replace(DEFAULT_IMAGE_TOKEN, f"", 1).strip()
+
+                text_prompt = text_prompt.strip()
+
+            text_prompt = (DEFAULT_IMAGE_TOKEN) * num_images + '\n' + text_prompt
+
+        return text_prompt
+
+    def model_template_fn(self, text_prompt, system_message=None, num_images=None):
+
+        if num_images:
+            text_prompt = self.check_and_add_image_token(text_prompt, num_images)
 
         messages = []
         if system_message:
@@ -1187,11 +1208,11 @@ def model_template_fn(self, text_prompt, system_message=None, num_images=None):
         messages.append(
             {
                 "role": "user", 
-                "content": content,
+                "content": text_prompt,
             }
         )
 
-        text_prompt = self.processor.apply_chat_template(
+        text_prompt = self.processor.tokenizer.apply_chat_template(
             messages,
             tokenize=False,
             add_generation_prompt=True,
@@ -1838,7 +1859,7 @@ class LocalVLLMModel(OpenAICommonRequestResponseMixIn, EndpointModel):
     temperature: float = 0.01
     top_p: float = 0.95
     top_k: int = -1
-    max_tokens: int = 2000
+    max_tokens: int = 1024
     frequency_penalty: float = 0
     presence_penalty: float = 0
 
