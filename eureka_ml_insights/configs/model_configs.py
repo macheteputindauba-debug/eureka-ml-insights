@@ -368,19 +368,55 @@ GEMMA3_12B_IT_CONFIG = ModelConfig(
         # specify ports in case the model is already deployed
         "ports": ["8009"],
         "max_concurrent": 1,
-        "max_tokens": 1024,
+        "max_tokens": 4096,
     },
 )
 
-KIMIVL_3B_IT_CONFIG = ModelConfig(
+KIMIVL_3B_INSTRUCT_CONFIG = ModelConfig(
     LocalVLLMModel,
     {
         # this name must match the vllm deployment name/path
         "model_name": "moonshotai/Kimi-VL-A3B-Instruct",
         # specify ports in case the model is already deployed
-        "ports": ["8009"],
+        #"ports": ["8010"],
         "max_concurrent": 1,
-        "max_tokens": 1024,
+        "max_tokens": 4096,
+    },
+)
+
+KIMIVL_3B_THINKING_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "moonshotai/Kimi-VL-A3B-Thinking-2506",
+        # specify ports in case the model is already deployed
+        #"ports": ["8010"],
+        "max_concurrent": 1,
+        "max_tokens": 4096,
+    },
+)
+
+QWEN3_VL_8B_INSTRUCT_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "Qwen/Qwen3-VL-8B-Instruct",
+        # specify ports in case the model is already deployed
+        #"ports": ["8009"],
+        "max_concurrent": 1,
+        "max_tokens": 4096,
+    },
+)
+
+QWEN3_VL_8B_THINKING_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+        # specify ports in case the model is already deployed
+        #"ports": ["8009"],
+        "max_concurrent": 1,
+        "max_tokens": 4096,
     },
 )
 
