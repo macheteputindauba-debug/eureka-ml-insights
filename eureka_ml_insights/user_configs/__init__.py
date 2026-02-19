@@ -1,3 +1,4 @@
+from .blink import BLINK_BASELINE_PIPELINE
 from .aime import (
     AIME2025_HYBRIDEXTRACT_PIPELINE,
     AIME2025_PIPELINE,
@@ -12,6 +13,7 @@ from .ba_calendar import (
     BA_Calendar_RunEvals_PIPELINE,
 )
 from .dna import DNA_PIPELINE
+from .docvqa import DOCVQA_VAL_PIPELINE, DOCVQA_TEST_PIPELINE
 from .drop import Drop_Experiment_Pipeline
 from .flenqa import FlenQA_Experiment_Pipeline
 from .flickr30k import FLICKR30K_PIPELINE
@@ -70,8 +72,13 @@ from .mmmu import (
 )
 from .muirbench import MUIRBENCH_BASELINE_PIPELINE
 from .mmiu import MMIU_BASELINE_PIPELINE
+from .mm_safetybench import (
+    MM_SAFETYBENCH_PIPELINE,
+    MM_SAFETYBENCH_ALL_SCENARIOS_PIPELINE,
+)
 
 from .nocaps import NOCAPS_PIPELINE
+from .ocrbench import OCRBENCH_PIPELINE, OCRBENCH_V2_PIPELINE
 from .nondeterminism import (
     Geo_Nondeterminism,
     IFEval_Nondeterminism,
@@ -126,6 +133,7 @@ from .vision_language.spatial_map import (
     SPATIAL_MAP_TEXTONLY_PIPELINE,
 )
 from .vstar_bench import VSTAR_BENCH_PIPELINE
+from .wildvision import WILDVISION_PIPELINE
 
 __all__ = [
     LLM_EXTRACTION_SUBPIPELINE_MIXIN,
@@ -225,4 +233,12 @@ __all__ = [
     MUIRBENCH_BASELINE_PIPELINE,
     MMIU_BASELINE_PIPELINE,
     CHARTQA_PIPELINE,
+    MM_SAFETYBENCH_PIPELINE,
+    MM_SAFETYBENCH_ALL_SCENARIOS_PIPELINE,
+    BLINK_BASELINE_PIPELINE,
+    DOCVQA_VAL_PIPELINE,
+    DOCVQA_TEST_PIPELINE,
+    OCRBENCH_PIPELINE,
+    OCRBENCH_V2_PIPELINE,
+    WILDVISION_PIPELINE,
 ]

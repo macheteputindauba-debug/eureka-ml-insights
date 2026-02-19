@@ -1,4 +1,5 @@
 from .chartqa_metrics import ChartQARelaxedAccuracyMetric
+from .docvqa_metrics import DocVQAANLSMetric, OCRBenchSubstringMetric
 from .f1score_metrics import MaxTokenF1ScoreMetric
 from .geomtric_reasoning_metrics import GeoMCQMetric
 from .metrics_base import (
@@ -64,4 +65,6 @@ __all__ = [
     NPHardTSPMetric,
     NPHardSATMetric,
     BboxMetric,
+    DocVQAANLSMetric,
+    OCRBenchSubstringMetric,
 ]

@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+import json
+from dataclasses import dataclass, field
 
 import pandas as pd
 
@@ -146,4 +147,85 @@ class CreateMMIUPrompts(DFTransformBase):
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         df["prompt"] = df.apply(self._create_prompt, axis=1)
 
-        return df            
+        return df
+
+
+BLINK_SUBTASKS = [
+    "Art_Style",
+    "Counting",
+    "Forensic_Detection",
+    "Functional_Correspondence",
+    "IQ_Test",
+    "Jigsaw",
+    "Multi-view_Reasoning",
+    "Object_Localization",
+    "Relative_Depth",
+    "Relative_Reflectance",
+    "Semantic_Correspondence",
+    "Spatial_Relation",
+    "Visual_Correspondence",
+    "Visual_Similarity",
+]
+
+
+@dataclass
+class CreateBLINKPrompts(DFTransformBase):
+    """
+    Create prompts for the BLINK benchmark.
+    Combines the task context (prompt column) with the question and formatted choices.
+    Also normalizes the answer column from "(A)" to "A".
+    """
+
+    def _create_prompt(self, sample):
+        context = sample.get("prompt", "")
+        question = sample["question"]
+        choices = sample["choices"]
+
+        # Format choices
+        choices_text = ""
+        for i, choice in enumerate(choices):
+            choices_text += f"({chr(ord('A') + i)}) {choice}\n"
+
+        # Build full prompt
+        parts = []
+        if context:
+            parts.append(context)
+        parts.append(question)
+        parts.append(choices_text)
+        parts.append("Answer with the option's letter from the given choices directly.")
+
+        return "\n".join(parts)
+
+    @staticmethod
+    def _normalize_answer(answer):
+        """Strip parentheses from answer: '(A)' -> 'A'."""
+        if isinstance(answer, str):
+            return answer.strip().strip("()")
+        return answer
+
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        df["prompt"] = df.apply(self._create_prompt, axis=1)
+        df["answer"] = df["answer"].apply(self._normalize_answer)
+        return df
+
+
+@dataclass
+class MergeBaselineAnswers(DFTransformBase):
+    """Merge baseline model answers from a JSONL file into the dataframe.
+
+    The baseline file should have one JSON object per line with at least
+    'question_id' and 'output' fields (WildVision format).
+    """
+
+    baseline_path: str = ""
+    key_column: str = "question_id"
+    output_column: str = "baseline_output"
+
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        baseline = {}
+        with open(self.baseline_path, "r") as f:
+            for line in f:
+                entry = json.loads(line.strip())
+                baseline[entry[self.key_column]] = entry["output"]
+        df[self.output_column] = df[self.key_column].map(baseline)
+        return df
