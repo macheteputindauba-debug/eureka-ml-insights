@@ -42,8 +42,19 @@ class MATHVISION_PIPELINE(ExperimentConfig):
         
         # Get the user provided LLM judge configuration, defaulting to PERSONAL_GPT4O if not provided.
         LLM_JUDGE_CONFIG = kwargs.get("llm_judge_config", PERSONAL_GPT4O)
+        sample_count = kwargs.get("sample_count", None)
 
         # Configure the data processing component.
+        transforms = [
+            CopyColumn(column_name_src="options", column_name_dst="options_string"),
+            MapStringsTransform(
+                columns='options_string',
+                mapping=lambda x: "" if len(x)==0 else ("\n[Options]:\n" + '\n'.join([chr(ord('A') + i) + ". " + opt for i, opt in enumerate(x)]))
+            ),
+        ]
+        if sample_count is not None:
+            transforms.append(SamplerTransform(sample_count=sample_count, random_seed=42))
+
         self.data_processing_comp = PromptProcessingConfig(
             component_type=PromptProcessing,
             data_reader_config=DataSetConfig(
@@ -52,15 +63,7 @@ class MATHVISION_PIPELINE(ExperimentConfig):
                     "path": "MathLLMs/MathVision",
                     "split": "test",
                     "tasks": ["default"],
-                    "transform": SequenceTransform(
-                        [
-                            CopyColumn(column_name_src="options", column_name_dst="options_string"),
-                            MapStringsTransform(
-                                columns='options_string',
-                                mapping=lambda x: "" if len(x)==0 else ("\n[Options]:\n" + '\n'.join([chr(ord('A') + i) + ". " + opt for i, opt in enumerate(x)]))
-                            ),
-                        ]
-                    ),
+                    "transform": SequenceTransform(transforms),
                 },
             ),
             prompt_template_path=os.path.join(

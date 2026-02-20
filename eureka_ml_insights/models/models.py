@@ -584,6 +584,17 @@ class OpenAICommonRequestResponseMixIn:
         return request_body
 
     def get_response(self, request):
+
+        if "extra_body" in request:
+            extra_body = request.pop("extra_body")
+        else:
+            extra_body = {}
+
+        if hasattr(self, "top_k") and self.top_k is not None:            
+            extra_body["top_k"] = self.top_k
+        if hasattr(self, "repetition_penalty") and self.repetition_penalty is not None:
+            extra_body["repetition_penalty"] = self.repetition_penalty
+
         start_time = time.time()
         completion = self.client.chat.completions.create(
             model=self.model_name,
@@ -593,6 +604,7 @@ class OpenAICommonRequestResponseMixIn:
             presence_penalty=self.presence_penalty,
             temperature=self.temperature,
             max_tokens=self.max_tokens,
+            extra_body=extra_body,
             **request,
         )
         end_time = time.time()
@@ -1862,6 +1874,7 @@ class LocalVLLMModel(OpenAICommonRequestResponseMixIn, EndpointModel):
     max_tokens: int = 1024
     frequency_penalty: float = 0
     presence_penalty: float = 0
+    repetition_penalty: float = 1
 
     def __post_init__(self):
         if not self.model_name:

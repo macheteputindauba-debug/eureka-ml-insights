@@ -360,27 +360,40 @@ QWQ32B_LOCAL_CONFIG = ModelConfig(
     },
 )
 
+####
+
 GEMMA3_12B_IT_CONFIG = ModelConfig(
     LocalVLLMModel,
     {
         # this name must match the vllm deployment name/path
         "model_name": "google/gemma-3-12b-it",
         # specify ports in case the model is already deployed
-        "ports": ["8009"],
         "max_concurrent": 1,
         "max_tokens": 4096,
+        "top_p": 0.95,        
+        "temperature": 1.0,
     },
 )
 
-KIMIVL_3B_INSTRUCT_CONFIG = ModelConfig(
+KIMIVL_3B_INSTRUCT_512_CONFIG = ModelConfig(
     LocalVLLMModel,
     {
         # this name must match the vllm deployment name/path
         "model_name": "moonshotai/Kimi-VL-A3B-Instruct",
-        # specify ports in case the model is already deployed
-        #"ports": ["8010"],
+        "max_concurrent": 1,
+        "max_tokens": 512,
+        "temperature": 0,
+    }
+)
+
+KIMIVL_3B_INSTRUCT_4K_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "moonshotai/Kimi-VL-A3B-Instruct",
         "max_concurrent": 1,
         "max_tokens": 4096,
+        "temperature": 0,
     },
 )
 
@@ -389,36 +402,136 @@ KIMIVL_3B_THINKING_CONFIG = ModelConfig(
     {
         # this name must match the vllm deployment name/path
         "model_name": "moonshotai/Kimi-VL-A3B-Thinking-2506",
-        # specify ports in case the model is already deployed
-        #"ports": ["8010"],
         "max_concurrent": 1,
         "max_tokens": 4096,
+        "temperature": 0.8,
+        "trust_remote_code": True,
     },
 )
 
-QWEN3_VL_8B_INSTRUCT_CONFIG = ModelConfig(
+KIMIVL_3B_THINKING_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "moonshotai/Kimi-VL-A3B-Thinking-2506",
+        "max_concurrent": 1,
+        "max_tokens": 32768,
+        "temperature": 0.8,
+        "trust_remote_code": True,
+    },
+)
+
+QWEN3_VL_8B_INSTRUCT_4K_CONFIG = ModelConfig(
     LocalVLLMModel,
     {
         # this name must match the vllm deployment name/path
         "model_name": "Qwen/Qwen3-VL-8B-Instruct",
-        # specify ports in case the model is already deployed
-        #"ports": ["8009"],
         "max_concurrent": 1,
+        "seed": 3407,
+        "top_p": 0.8,
+        "top_k": 20,
+        "temperature": 0.7,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 1.5,        
         "max_tokens": 4096,
     },
 )
 
-QWEN3_VL_8B_THINKING_CONFIG = ModelConfig(
+QWEN3_VL_8B_INSTRUCT_16K_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "Qwen/Qwen3-VL-8B-Instruct",
+        "max_concurrent": 1,
+        "seed": 3407,
+        "top_p": 0.8,
+        "top_k": 20,
+        "temperature": 0.7,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 1.5,        
+        "max_tokens": 16384,
+    },
+)
+
+QWEN3_VL_8B_INSTRUCT_32K_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "Qwen/Qwen3-VL-8B-Instruct",
+        "max_concurrent": 1,
+        "seed": 3407,
+        "top_p": 0.8,
+        "top_k": 20,
+        "temperature": 0.7,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 1.5,
+    },
+)
+
+QWEN3_VL_8B_THINKING_4K_CONFIG = ModelConfig(
     LocalVLLMModel,
     {
         # this name must match the vllm deployment name/path
         "model_name": "Qwen/Qwen3-VL-8B-Thinking",
-        # specify ports in case the model is already deployed
-        #"ports": ["8009"],
         "max_concurrent": 1,
+        "seed": 1234,
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
+        "temperature": 0.6,           
         "max_tokens": 4096,
     },
 )
+
+QWEN3_VL_8B_THINKING_16K_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+        "max_concurrent": 1,
+        "seed": 1234,
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
+        "temperature": 0.6,
+    },
+)
+
+QWEN3_VL_8B_THINKING_32K_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+        "max_concurrent": 1,
+        "seed": 1234,
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
+        "temperature": 0.6,           
+        "max_tokens": 32768,
+    },
+)
+
+QWEN3_VL_8B_THINKING_40K_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+        "max_concurrent": 1,
+        "seed": 1234,
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
+        "temperature": 0.6,           
+        "max_tokens": 40960,
+    },
+)
+
+####
 
 # DeepSeek R1 Endpoints on Azure
 DEEPSEEK_R1_CONFIG = ModelConfig(

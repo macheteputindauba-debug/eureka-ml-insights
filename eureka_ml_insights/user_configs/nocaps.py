@@ -45,8 +45,15 @@ class NOCAPS_PIPELINE(ExperimentConfig):
         
         # Get the user provided LLM judge configuration, defaulting to PERSONAL_GPT4O if not provided.
         LLM_JUDGE_CONFIG = kwargs.get("llm_judge_config", PERSONAL_GPT4O)
-        
+        sample_count = kwargs.get("sample_count", None)
+
         # Configure the data processing component.
+        transforms = [
+            AddColumnAndData(column_name="prompt", data="Write a brief caption to summarize the contents of the image."),
+        ]
+        if sample_count is not None:
+            transforms.append(SamplerTransform(sample_count=sample_count, random_seed=42))
+
         self.data_processing_comp = PromptProcessingConfig(
             component_type=PromptProcessing,
             data_reader_config=DataSetConfig(
@@ -54,12 +61,7 @@ class NOCAPS_PIPELINE(ExperimentConfig):
                 {
                     "path": "HuggingFaceM4/NoCaps",
                     "split": "validation",
-                    "transform": SequenceTransform(
-                        [
-                            AddColumnAndData(column_name="prompt", data="Write a brief caption to summarize the contents of the image."),
-                            #SamplerTransform(sample_count=200, random_seed=1234),
-                        ]
-                    ),
+                    "transform": SequenceTransform(transforms),
                 },
             ),
             output_dir=os.path.join(self.log_dir, "data_processing_output"),

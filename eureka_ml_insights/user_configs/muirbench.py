@@ -11,6 +11,7 @@ from eureka_ml_insights.data_utils import (
     DataReader,
     HFDataReader,
     MMDataLoader,
+    SamplerTransform,
     SequenceTransform,
 )
 from eureka_ml_insights.data_utils.mmmu_utils import CreateMUIRBENCHPrompts
@@ -35,7 +36,15 @@ class MUIRBENCH_BASELINE_PIPELINE(ExperimentConfig):
     """
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-    
+        sample_count = kwargs.get("sample_count", None)
+
+        transforms = [
+            CreateMUIRBENCHPrompts(),
+            ColumnRename(name_mapping={"answer": "ground_truth", "options": "target_options"}),
+        ]
+        if sample_count is not None:
+            transforms.append(SamplerTransform(sample_count=sample_count, random_seed=42))
+
         self.data_processing_comp = PromptProcessingConfig(
         component_type=PromptProcessing,
         data_reader_config=DataSetConfig(
@@ -43,12 +52,7 @@ class MUIRBENCH_BASELINE_PIPELINE(ExperimentConfig):
             {
                 "path": "MUIRBENCH/MUIRBENCH",
                 "split": "test",
-                "transform": SequenceTransform(
-                    [
-                        CreateMUIRBENCHPrompts(),
-                        ColumnRename(name_mapping={"answer": "ground_truth", "options": "target_options"}),
-                    ]
-                ),
+                "transform": SequenceTransform(transforms),
             },
         ),     
         output_dir=os.path.join(self.log_dir, "data_processing_output"),

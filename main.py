@@ -25,6 +25,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--resume_from", type=str, help="The path to the inference_result.jsonl to resume from.", default=None
     )
+    parser.add_argument(
+        "--sample_count", type=int, help="Number of samples to use. If not set, runs the full benchmark.", default=None
+    )
     parser.add_argument("--local_vllm", action="store_true", help="Deploy/use local vllm for inference.")
     parser.add_argument("--ports", type=str, nargs="*", help="Ports where vllm model is already hosted.", default=None)
     parser.add_argument("--num_servers", type=int, help="Number of servers to deploy.", default=None)
@@ -86,6 +89,8 @@ if __name__ == "__main__":
 
     if args.resume_from:
         init_args["resume_from"] = args.resume_from
+    if args.sample_count is not None:
+        init_args["sample_count"] = args.sample_count
 
     if experiment_config_class in dir(configs):
         experiment_config_class = getattr(configs, experiment_config_class)

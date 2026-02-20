@@ -13,7 +13,6 @@ from eureka_ml_insights.data_utils import (
     SamplerTransform,
     ColumnRename,
     AddColumn,
-    MultiplyTransform,
 )
 from eureka_ml_insights.metrics import CountAggregator, SubstringExistsMatch
 
@@ -55,20 +54,23 @@ class VSTAR_BENCH_PIPELINE(ExperimentConfig):
 
         # Get the user provided LLM judge configuration, defaulting to PERSONAL_GPT4O if not provided.
         LLM_JUDGE_CONFIG = kwargs.get("llm_judge_config", PERSONAL_GPT4O)
+        sample_count = kwargs.get("sample_count", None)
 
         print(LLM_JUDGE_CONFIG)
 
         # Download V*Bench from HuggingFace
+        data_reader_args = {
+            "path": "tmlabonte/vstar_bench",
+            "split": "test",
+        }
+        if sample_count is not None:
+            data_reader_args["transform"] = SamplerTransform(sample_count=sample_count, random_seed=42)
+
         self.data_processing_comp = PromptProcessingConfig(
             component_type=PromptProcessing,
             data_reader_config=DataSetConfig(
                 HFDataReader,
-                {
-                    "path": "tmlabonte/vstar_bench",
-                    "split": "test",
-                    #"transform": SamplerTransform(sample_count=10, random_seed=42),
-                    "transform": MultiplyTransform(3),
-                },
+                data_reader_args,
             ),
             output_dir=os.path.join(self.log_dir, "data_processing_output"),
         )

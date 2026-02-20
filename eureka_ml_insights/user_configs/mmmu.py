@@ -11,6 +11,7 @@ from eureka_ml_insights.data_utils import (
     HFDataReader,
     MapStringsTransform,
     MMDataLoader,
+    SamplerTransform,
     SequenceTransform,
 )
 from eureka_ml_insights.data_utils.mmmu_utils import (
@@ -39,7 +40,16 @@ class MMMU_BASELINE_PIPELINE(ExperimentConfig):
     """
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-    
+        sample_count = kwargs.get("sample_count", None)
+
+        transforms = [
+            ASTEvalTransform(columns=["options"]),
+            CreateMMMUPrompts(),
+            ColumnRename(name_mapping={"answer": "ground_truth", "options": "target_options"}),
+        ]
+        if sample_count is not None:
+            transforms.append(SamplerTransform(sample_count=sample_count, random_seed=42))
+
         self.data_processing_comp = PromptProcessingConfig(
         component_type=PromptProcessing,
         data_reader_config=DataSetConfig(
@@ -48,13 +58,7 @@ class MMMU_BASELINE_PIPELINE(ExperimentConfig):
                 "path": "MMMU/MMMU",
                 "split": "validation",
                 "tasks": MMMUAll,
-                "transform": SequenceTransform(
-                    [
-                        ASTEvalTransform(columns=["options"]),
-                        CreateMMMUPrompts(),
-                        ColumnRename(name_mapping={"answer": "ground_truth", "options": "target_options"}),
-                    ]
-                ),
+                "transform": SequenceTransform(transforms),
             },
         ),     
         output_dir=os.path.join(self.log_dir, "data_processing_output"),
@@ -110,7 +114,7 @@ class MMMU_COT_PIPELINE(MMMU_BASELINE_PIPELINE):
     """This class extends MMMU_BASELINE_PIPELINE to use a COT prompt."""
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-        config = super().configure_pipeline(model_config, resume_from)
+        config = super().configure_pipeline(model_config, resume_from, **kwargs)
         self.data_processing_comp.prompt_template_path=os.path.join(
                 os.path.dirname(__file__),
                 "../prompt_templates/mmmu_templates/cot.jinja",

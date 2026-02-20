@@ -20,7 +20,6 @@ from eureka_ml_insights.data_utils import (
     SamplerTransform,
     SequenceTransform,
     SelectTransform,
-    MultiplyTransform,
 )
 
 from eureka_ml_insights.configs import(
@@ -44,8 +43,20 @@ class MATHVISTA_PIPELINE(ExperimentConfig):
         
         # Get the user provided LLM judge configuration, defaulting to PERSONAL_GPT4O if not provided.
         LLM_JUDGE_CONFIG = kwargs.get("llm_judge_config", PERSONAL_GPT4O)
+        sample_count = kwargs.get("sample_count", None)
 
         # Configure the data processing component.
+        transforms = [
+            CopyColumn(column_name_src="query", column_name_dst="prompt"),
+            CopyColumn(column_name_src="metadata", column_name_dst="task"),
+            MapStringsTransform(columns="task", mapping=lambda d: d["task"]),
+        ]
+        if sample_count is not None:
+            transforms.append(SamplerTransform(sample_count=sample_count, random_seed=42))
+        transforms.extend([
+            ImputeNA(columns=["choices", "precision", "unit"], value=""),
+        ])
+
         self.data_processing_comp = PromptProcessingConfig(
             component_type=PromptProcessing,
             data_reader_config=DataSetConfig(
@@ -54,18 +65,7 @@ class MATHVISTA_PIPELINE(ExperimentConfig):
                     "path": "AI4Math/MathVista",
                     "split": "testmini",
                     "tasks": ["default"],
-                    "transform": SequenceTransform(
-                        [
-                            #SelectTransform(indices=list(range(0,1000,10))),  # Select every 10th sample for a smaller subset
-                            CopyColumn(column_name_src="query", column_name_dst="prompt"),
-                            # there is some info in the metadata field that serves as a nice aggregator
-                            CopyColumn(column_name_src="metadata", column_name_dst="task"),
-                            MapStringsTransform(columns="task", mapping=lambda d: d["task"]),
-                            #SamplerTransform(sample_count=32, random_seed=1234),
-                            ImputeNA(columns=["choices", "precision", "unit"], value=""),
-                            MultiplyTransform(3),
-                        ]
-                    ),
+                    "transform": SequenceTransform(transforms),
                 },
             ),
             output_dir=os.path.join(self.log_dir, "data_processing_output"),

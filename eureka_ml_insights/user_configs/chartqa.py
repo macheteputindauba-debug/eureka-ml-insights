@@ -34,6 +34,7 @@ from eureka_ml_insights.data_utils import (
     DataReader,
     HFDataReader,
     MMDataLoader,
+    SamplerTransform,
     SequenceTransform,
 )
 from eureka_ml_insights.metrics import CountAggregator
@@ -53,7 +54,15 @@ class CHARTQA_PIPELINE(ExperimentConfig):
     def configure_pipeline(
         self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any]
     ) -> PipelineConfig:
+        sample_count = kwargs.get("sample_count", None)
+
         # Data processing component with prompt template
+        transforms = [
+            ColumnRename(name_mapping={"answer": "ground_truth"}),
+        ]
+        if sample_count is not None:
+            transforms.append(SamplerTransform(sample_count=sample_count, random_seed=42))
+
         self.data_processing_comp = PromptProcessingConfig(
             component_type=PromptProcessing,
             data_reader_config=DataSetConfig(
@@ -61,11 +70,7 @@ class CHARTQA_PIPELINE(ExperimentConfig):
                 {
                     "path": "lmms-lab/ChartQA",
                     "split": "test",
-                    "transform": SequenceTransform(
-                        [
-                            ColumnRename(name_mapping={"answer": "ground_truth"}),
-                        ]
-                    ),
+                    "transform": SequenceTransform(transforms),
                 },
             ),
             prompt_template_path=os.path.join(
