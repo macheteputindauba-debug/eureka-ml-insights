@@ -372,6 +372,7 @@ GEMMA3_12B_IT_CONFIG = ModelConfig(
         "max_tokens": 4096,
         "top_p": 0.95,        
         "temperature": 1.0,
+        "ports": ["8008"],
     },
 )
 
@@ -383,6 +384,7 @@ KIMIVL_3B_INSTRUCT_512_CONFIG = ModelConfig(
         "max_concurrent": 1,
         "max_tokens": 512,
         "temperature": 0,
+        "ports": ["8008"],        
     }
 )
 
@@ -394,10 +396,11 @@ KIMIVL_3B_INSTRUCT_4K_CONFIG = ModelConfig(
         "max_concurrent": 1,
         "max_tokens": 4096,
         "temperature": 0,
+        "ports": ["8008"],        
     },
 )
 
-KIMIVL_3B_THINKING_CONFIG = ModelConfig(
+KIMIVL_3B_THINKING_4K_CONFIG = ModelConfig(
     LocalVLLMModel,
     {
         # this name must match the vllm deployment name/path
@@ -406,10 +409,11 @@ KIMIVL_3B_THINKING_CONFIG = ModelConfig(
         "max_tokens": 4096,
         "temperature": 0.8,
         "trust_remote_code": True,
+        "ports": ["8008"],        
     },
 )
 
-KIMIVL_3B_THINKING_CONFIG = ModelConfig(
+KIMIVL_3B_THINKING_32K_CONFIG = ModelConfig(
     LocalVLLMModel,
     {
         # this name must match the vllm deployment name/path
@@ -418,6 +422,7 @@ KIMIVL_3B_THINKING_CONFIG = ModelConfig(
         "max_tokens": 32768,
         "temperature": 0.8,
         "trust_remote_code": True,
+        "ports": ["8008"],        
     },
 )
 
@@ -434,6 +439,7 @@ QWEN3_VL_8B_INSTRUCT_4K_CONFIG = ModelConfig(
         "repetition_penalty": 1.0,
         "presence_penalty": 1.5,        
         "max_tokens": 4096,
+        "ports": ["8008"],        
     },
 )
 
@@ -450,6 +456,7 @@ QWEN3_VL_8B_INSTRUCT_16K_CONFIG = ModelConfig(
         "repetition_penalty": 1.0,
         "presence_penalty": 1.5,        
         "max_tokens": 16384,
+        "ports": ["8008"],        
     },
 )
 
@@ -465,6 +472,7 @@ QWEN3_VL_8B_INSTRUCT_32K_CONFIG = ModelConfig(
         "temperature": 0.7,
         "repetition_penalty": 1.0,
         "presence_penalty": 1.5,
+        "ports": ["8008"],        
     },
 )
 
@@ -481,6 +489,7 @@ QWEN3_VL_8B_THINKING_4K_CONFIG = ModelConfig(
         "presence_penalty": 0.0,
         "temperature": 0.6,           
         "max_tokens": 4096,
+        "ports": ["8008"],        
     },
 )
 
@@ -496,6 +505,7 @@ QWEN3_VL_8B_THINKING_16K_CONFIG = ModelConfig(
         "repetition_penalty": 1.0,
         "presence_penalty": 0.0,
         "temperature": 0.6,
+        "ports": ["8008"],        
     },
 )
 
@@ -512,6 +522,7 @@ QWEN3_VL_8B_THINKING_32K_CONFIG = ModelConfig(
         "presence_penalty": 0.0,
         "temperature": 0.6,           
         "max_tokens": 32768,
+        "ports": ["8008"],        
     },
 )
 
@@ -528,6 +539,7 @@ QWEN3_VL_8B_THINKING_40K_CONFIG = ModelConfig(
         "presence_penalty": 0.0,
         "temperature": 0.6,           
         "max_tokens": 40960,
+        "ports": ["8008"],        
     },
 )
 

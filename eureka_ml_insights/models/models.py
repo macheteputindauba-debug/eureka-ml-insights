@@ -17,6 +17,8 @@ from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
 from eureka_ml_insights.secret_management import get_secret
 
+# logging.getLogger("httpx").setLevel(logging.WARNING)
+# logging.getLogger("httpcore").setLevel(logging.WARNING)
 
 @dataclass
 class Model(ABC):
@@ -540,7 +542,6 @@ class DeepseekR1ServerlessAzureRestEndpointModel(ServerlessAzureRestEndpointMode
         }
         body = str.encode(json.dumps(data))
         return urllib.request.Request(self.url, body, self.headers)
-
 
 @dataclass
 class OpenAICommonRequestResponseMixIn:
