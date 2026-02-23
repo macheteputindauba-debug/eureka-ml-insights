@@ -27,7 +27,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--local_vllm", action="store_true", help="Deploy/use local vllm for inference.")
     parser.add_argument("--ports", type=str, nargs="*", help="Ports where vllm model is already hosted.", default=None)
-    parser.add_argument("--num_servers", type=int, help="Number of servers to deploy.", default=None)
+    parser.add_argument("--num_servers", type=int, help="Number of servers to deploy.", default=1)
     init_args = {}
 
     # catch any unknown arguments

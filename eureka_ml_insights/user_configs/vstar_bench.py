@@ -66,8 +66,6 @@ class VSTAR_BENCH_PIPELINE(ExperimentConfig):
                 {
                     "path": "tmlabonte/vstar_bench",
                     "split": "test",
-                    #"transform": SamplerTransform(sample_count=10, random_seed=42),
-                    "transform": MultiplyTransform(3),
                 },
             ),
             output_dir=os.path.join(self.log_dir, "data_processing_output"),
