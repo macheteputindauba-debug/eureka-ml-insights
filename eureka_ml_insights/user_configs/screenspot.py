@@ -45,7 +45,7 @@ class SCREENSPOT_NORMALIZED_PIPELINE(ExperimentConfig):
         data_reader_config=DataSetConfig(
             DataReader,
             {
-                "path": "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/screenspot_all.jsonl",
+                "path": "/data/datasets/EVAL/ScreenSpot/screenspot_all.jsonl",                
                 "transform": SequenceTransform(transforms),
             },
         ),
@@ -64,7 +64,7 @@ class SCREENSPOT_NORMALIZED_PIPELINE(ExperimentConfig):
                 MMDataLoader,
                 {
                     "path": os.path.join(self.data_processing_comp.output_dir, "transformed_data.jsonl"),
-                    "mm_data_path_prefix": "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/images",
+                    "mm_data_path_prefix": "/data/datasets/EVAL/ScreenSpot/images",
                  },
             ),
             output_dir=os.path.join(self.log_dir, "inference_result"),
@@ -153,9 +153,9 @@ class SCREENSPOTV2_NORMALIZED_PIPELINE(SCREENSPOT_NORMALIZED_PIPELINE):
     """
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-        config = super().configure_pipeline(model_config, resume_from, **kwargs)
-        self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/screenspot_all_v2.jsonl"
-        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/images_v2"
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.data_reader_config.init_args["path"] = "/data/datasets/EVAL/ScreenSpot/screenspot_all_v2.jsonl"
+        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/data/datasets/EVAL/ScreenSpot/images_v2"
         return config
     
 class SCREENSPOTV2_NORMALIZED_1000_PIPELINE(SCREENSPOT_NORMALIZED_1000_PIPELINE):
@@ -165,9 +165,9 @@ class SCREENSPOTV2_NORMALIZED_1000_PIPELINE(SCREENSPOT_NORMALIZED_1000_PIPELINE)
     """
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-        config = super().configure_pipeline(model_config, resume_from, **kwargs)
-        self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/screenspot_all_v2.jsonl"
-        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/images_v2"
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.data_reader_config.init_args["path"] = "/data/datasets/EVAL/ScreenSpot/screenspot_all_v2.jsonl"
+        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/data/datasets/EVAL/ScreenSpot/images_v2"
         return config
 
 class SCREENSPOTV2_NORMALIZED_1024_PIPELINE(SCREENSPOT_NORMALIZED_1024_PIPELINE):
@@ -177,9 +177,9 @@ class SCREENSPOTV2_NORMALIZED_1024_PIPELINE(SCREENSPOT_NORMALIZED_1024_PIPELINE)
     """
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-        config = super().configure_pipeline(model_config, resume_from, **kwargs)
-        self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/screenspot_all_v2.jsonl"
-        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/images_v2"
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.data_reader_config.init_args["path"] = "/data/datasets/EVAL/ScreenSpot/screenspot_all_v2.jsonl"
+        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/data/datasets/EVAL/ScreenSpot/images_v2"
         return config        
 
 class SCREENSPOTV2_UNNORMALIZED_PIPELINE(SCREENSPOT_UNNORMALIZED_PIPELINE):
@@ -189,9 +189,9 @@ class SCREENSPOTV2_UNNORMALIZED_PIPELINE(SCREENSPOT_UNNORMALIZED_PIPELINE):
     """
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-        config = super().configure_pipeline(model_config, resume_from, **kwargs)
-        self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/screenspot_all_v2.jsonl"
-        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/images_v2"
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.data_reader_config.init_args["path"] = "/data/datasets/EVAL/ScreenSpot/screenspot_all_v2.jsonl"
+        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/data/datasets/EVAL/ScreenSpot/images_v2"
         return config
 
 class SCREENSPOT_PRO_NORMALIZED_PIPELINE(SCREENSPOT_NORMALIZED_PIPELINE):
@@ -201,9 +201,9 @@ class SCREENSPOT_PRO_NORMALIZED_PIPELINE(SCREENSPOT_NORMALIZED_PIPELINE):
     """
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-        config = super().configure_pipeline(model_config, resume_from, **kwargs)
-        self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/screenspot_pro_all.jsonl"
-        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/images"
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.data_reader_config.init_args["path"] = "/data/datasets/EVAL/ScreenSpot-Pro/screenspot_pro_all.jsonl"
+        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/data/datasets/EVAL/ScreenSpot-Pro/images"
         self.evalreporting_comp.metric_config = MetricConfig(BboxMetric, {"normalize_mode": BboxMetric.NormalizeMode.NORMALIZED, "xywh": False})
         return config
 
@@ -214,9 +214,9 @@ class SCREENSPOT_PRO_NORMALIZED_1000_PIPELINE(SCREENSPOT_NORMALIZED_1000_PIPELIN
     """
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-        config = super().configure_pipeline(model_config, resume_from, **kwargs)
-        self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/screenspot_pro_all.jsonl"
-        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/images"
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.data_reader_config.init_args["path"] = "/data/datasets/EVAL/ScreenSpot-Pro/screenspot_pro_all.jsonl"
+        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/data/datasets/EVAL/ScreenSpot-Pro/images"
         self.evalreporting_comp.metric_config = MetricConfig(BboxMetric, {"normalize_mode": BboxMetric.NormalizeMode.NORMALIZED_1000, "xywh": False})
         return config        
     
@@ -227,9 +227,9 @@ class SCREENSPOT_PRO_NORMALIZED_1024_PIPELINE(SCREENSPOT_NORMALIZED_1024_PIPELIN
     """
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-        config = super().configure_pipeline(model_config, resume_from, **kwargs)
-        self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/screenspot_pro_all.jsonl"
-        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/images"
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.data_reader_config.init_args["path"] = "/data/datasets/EVAL/ScreenSpot-Pro/screenspot_pro_all.jsonl"
+        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/data/datasets/EVAL/ScreenSpot-Pro/images"
         self.evalreporting_comp.metric_config = MetricConfig(BboxMetric, {"normalize_mode": BboxMetric.NormalizeMode.NORMALIZED_1024, "xywh": False})
         return config    
 
@@ -240,9 +240,9 @@ class SCREENSPOT_PRO_UNNORMALIZED_PIPELINE(SCREENSPOT_UNNORMALIZED_PIPELINE):
     """
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-        config = super().configure_pipeline(model_config, resume_from, **kwargs)
-        self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/screenspot_pro_all.jsonl"
-        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/images"
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.data_reader_config.init_args["path"] = "/data/datasets/EVAL/ScreenSpot-Pro/screenspot_pro_all.jsonl"
+        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/data/datasets/EVAL/ScreenSpot-Pro/images"
         self.evalreporting_comp.metric_config = MetricConfig(BboxMetric, {"normalize_mode": BboxMetric.NormalizeMode.UNNORMALIZED, "xywh": False})
         return config
 
@@ -253,8 +253,8 @@ class SCREENSPOT_PRO_CROPPED_NORMALIZED_PIPELINE(SCREENSPOT_NORMALIZED_PIPELINE)
     """
 
     def configure_pipeline(self, model_config: ModelConfig, resume_from: str = None, **kwargs: dict[str, Any] ) -> PipelineConfig:
-        config = super().configure_pipeline(model_config, resume_from, **kwargs)
-        self.data_processing_comp.data_reader_config.init_args["path"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/screenspot_pro_all_cropped.jsonl"
-        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot-Pro/images_cropped"
+        config = super().configure_pipeline(model_config, resume_from)
+        self.data_processing_comp.data_reader_config.init_args["path"] = "/data/datasets/EVAL/ScreenSpot-Pro/screenspot_pro_all_cropped.jsonl"
+        self.inference_comp.data_loader_config.init_args["mm_data_path_prefix"] = "/data/datasets/EVAL/ScreenSpot-Pro/images_cropped"
         self.evalreporting_comp.metric_config = MetricConfig(BboxMetric, {"normalize_mode": BboxMetric.NormalizeMode.NORMALIZED, "xywh": False})
         return config 

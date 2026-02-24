@@ -248,9 +248,9 @@ class TestRateLimitedInference(unittest.TestCase):
             requests_per_minute=20,
         )
         component = Inference.from_config(self.config)
-        start = time.time()
+        start = time.perf_counter()
         component.run()
-        end = time.time()
+        end = time.perf_counter()
         self.duration = end - start
 
     # skip this test if environment variable skip_slow_tests is set

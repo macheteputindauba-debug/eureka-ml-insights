@@ -289,12 +289,12 @@ class Inference(Component):
         if self.requests_per_minute and self.max_concurrent == 1:
             while len(self.request_times) >= self.requests_per_minute:
                 # remove the oldest request time if it is older than the rate limit period
-                if time.time() - self.request_times[0] > self.period:
+                if time.perf_counter() - self.request_times[0] > self.period:
                     self.request_times.popleft()
                 else:
                     # rate limit is reached, wait for a second
                     time.sleep(1)
-            self.request_times.append(time.time())
+            self.request_times.append(time.perf_counter())
 
         response_dict = self.model.generate(*model_args, **model_kwargs)
         self.validate_response_dict(response_dict)

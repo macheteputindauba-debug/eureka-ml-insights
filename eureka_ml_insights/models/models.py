@@ -333,9 +333,9 @@ class RestEndpointModel(EndpointModel, KeyBasedAuthMixIn):
 
     def get_response(self, request):
         # Get the model response and measure the time taken.
-        start_time = time.time()
+        start_time = time.perf_counter()
         response = urllib.request.urlopen(request, timeout=self.timeout)
-        end_time = time.time()
+        end_time = time.perf_counter()
         # Parse the response and return the model output.
         res = json.loads(response.read())
         model_output = res["output"]
@@ -395,9 +395,9 @@ class ServerlessAzureRestEndpointModel(EndpointModel, KeyBasedAuthMixIn):
         raise NotImplementedError
 
     def get_response(self, request):
-        start_time = time.time()
+        start_time = time.perf_counter()
         response = urllib.request.urlopen(request, timeout=self.timeout)
-        end_time = time.time()
+        end_time = time.perf_counter()
         res = json.loads(response.read())
         model_output = res["choices"][0]["message"]["content"]
         response_time = end_time - start_time
@@ -596,7 +596,7 @@ class OpenAICommonRequestResponseMixIn:
         if hasattr(self, "repetition_penalty") and self.repetition_penalty is not None:
             extra_body["repetition_penalty"] = self.repetition_penalty
 
-        start_time = time.time()
+        start_time = time.perf_counter()
         completion = self.client.chat.completions.create(
             model=self.model_name,
             top_p=self.top_p,
@@ -606,9 +606,10 @@ class OpenAICommonRequestResponseMixIn:
             temperature=self.temperature,
             max_tokens=self.max_tokens,
             extra_body=extra_body,
+            timeout=360.0,
             **request,
         )
-        end_time = time.time()
+        end_time = time.perf_counter()
         openai_response = completion.model_dump()
         model_output = openai_response["choices"][0]["message"]["content"]
         response_time = end_time - start_time
@@ -739,7 +740,7 @@ class OpenAIOModelsRequestResponseMixIn:
         return request_body
 
     def get_response(self, request):
-        start_time = time.time()
+        start_time = time.perf_counter()
         if "o1-preview" in self.model_name:
             if self.reasoning_effort == "high":
                 logging.error("Reasoning effort is not supported by OpenAI O1 preview model.")
@@ -763,7 +764,7 @@ class OpenAIOModelsRequestResponseMixIn:
                 reasoning_effort=self.reasoning_effort,
                 **request,
             )
-        end_time = time.time()
+        end_time = time.perf_counter()
         openai_response = completion.model_dump()
         model_output = openai_response["choices"][0]["message"]["content"]
         response_time = end_time - start_time
@@ -861,7 +862,7 @@ class GeminiModel(EndpointModel, KeyBasedAuthMixIn):
             return text_prompt
 
     def get_response(self, request):
-        start_time = time.time()
+        start_time = time.perf_counter()
         gemini_response = None
         try:
             gemini_response = self.model.generate_content(
@@ -870,7 +871,7 @@ class GeminiModel(EndpointModel, KeyBasedAuthMixIn):
                 request_options={"timeout": self.timeout},
                 safety_settings=self.safety_settings,
             )
-            end_time = time.time()
+            end_time = time.perf_counter()
             model_output = gemini_response.parts[0].text
             response_time = end_time - start_time
         except Exception as e:
@@ -953,7 +954,7 @@ class TogetherModel(OpenAICommonRequestResponseMixIn, KeyBasedAuthMixIn, Endpoin
         self.client = Together(api_key=self.api_key)
 
     def get_response(self, request):
-        start_time = time.time()
+        start_time = time.perf_counter()
         completion = self.client.chat.completions.create(
             model=self.model_name,
             top_p=self.top_p,
@@ -964,7 +965,7 @@ class TogetherModel(OpenAICommonRequestResponseMixIn, KeyBasedAuthMixIn, Endpoin
             **request,
         )
 
-        end_time = time.time()
+        end_time = time.perf_counter()
         openai_response = completion.model_dump()
         model_output = openai_response["choices"][0]["message"]["content"]
         response_time = end_time - start_time
@@ -1055,7 +1056,7 @@ class HuggingFaceModel(Model):
     def _generate(self, text_prompt, query_images=None):
 
         inputs = self.tokenizer(text_prompt, return_tensors="pt").to(self.device)
-        start_time = time.time()
+        start_time = time.perf_counter()
         output_ids = self.model.generate(
             inputs["input_ids"],
             max_new_tokens=self.max_tokens,
@@ -1063,7 +1064,7 @@ class HuggingFaceModel(Model):
             top_p=self.top_p,
             do_sample=self.do_sample,
         )
-        end_time = time.time()
+        end_time = time.perf_counter()
         sequence_length = inputs["input_ids"].shape[1]
         new_output_ids = output_ids[:, sequence_length:]
         model_output = self.tokenizer.batch_decode(
@@ -1149,7 +1150,7 @@ class HuggingFaceModelMM(HuggingFaceModel):
     def _generate(self, text_prompt, query_images=None):
         inputs = self.processor(text=text_prompt, images=query_images, return_tensors="pt").to(self.device)
         
-        start_time = time.time()
+        start_time = time.perf_counter()
         try:
             output_ids = self.model.generate(
                 **inputs,
@@ -1162,7 +1163,7 @@ class HuggingFaceModelMM(HuggingFaceModel):
             logging.warning(e)
             return None
                     
-        end_time = time.time()
+        end_time = time.perf_counter()
         sequence_length = inputs["input_ids"].shape[1]
         new_output_ids = output_ids[:, sequence_length:]
         model_output = self.processor.batch_decode(
@@ -1325,7 +1326,7 @@ class LLaVAHuggingFaceModel(HuggingFaceModel):
 
     def _generate(self, text_prompt, query_images=None):
         inputs = self.processor(text=text_prompt, images=query_images, return_tensors="pt").to(self.device)
-        start_time = time.time()
+        start_time = time.perf_counter()
         output_ids = self.model.generate(
             **inputs,
             max_new_tokens=self.max_tokens,
@@ -1333,7 +1334,7 @@ class LLaVAHuggingFaceModel(HuggingFaceModel):
             top_p=self.top_p,
             do_sample=self.do_sample,
         )
-        end_time = time.time()
+        end_time = time.perf_counter()
         sequence_length = inputs["input_ids"].shape[1]
         new_output_ids = output_ids[:, sequence_length:]
         model_output = self.processor.batch_decode(
@@ -1395,7 +1396,7 @@ class Qwen3VLHFModel(HuggingFaceModel):
     temperature = 0.0
     max_tokens = 1024
     use_flash_attn = True
-    do_sample = False    
+    do_sample = False
 
     def __post_init__(self):
         super().__post_init__()
@@ -1432,7 +1433,7 @@ class Qwen3VLHFModel(HuggingFaceModel):
     def _generate(self, text_prompt, query_images=None):
         inputs = self.processor(text=text_prompt, images=query_images, return_tensors="pt").to(self.device)
 
-        start_time = time.time()
+        start_time = time.perf_counter()
         output_ids = self.model.generate(
             **inputs,
             max_new_tokens=self.max_tokens,
@@ -1442,7 +1443,8 @@ class Qwen3VLHFModel(HuggingFaceModel):
             repetition_penalty=self.repetition_penalty,
             do_sample=self.do_sample,
         )
-        end_time = time.time()
+
+        end_time = time.perf_counter()
         sequence_length = inputs["input_ids"].shape[1]
         new_output_ids = output_ids[:, sequence_length:]
         model_output = self.processor.batch_decode(
@@ -1550,7 +1552,7 @@ class LLaVAModel(LLaVAHuggingFaceModel):
         )
 
         with torch.inference_mode():
-            start_time = time.time()
+            start_time = time.perf_counter()
             output_ids = self.model.generate(
                 input_ids,
                 images=images_tensor,
@@ -1561,7 +1563,7 @@ class LLaVAModel(LLaVAHuggingFaceModel):
                 max_new_tokens=self.max_tokens,
                 use_cache=True,
             )
-            end_time = time.time()
+            end_time = time.perf_counter()
 
         model_output = self.tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
         response_time = end_time - start_time
@@ -1620,9 +1622,9 @@ class VLLMModel(Model):
             max_tokens=self.max_tokens,
         )
 
-        start_time = time.time()
+        start_time = time.perf_counter()
         outputs = self.model.chat(text_prompt, sampling_params)
-        end_time = time.time()
+        end_time = time.perf_counter()
 
         model_output = outputs[0].outputs[0].text
         response_time = end_time - start_time
@@ -1734,8 +1736,8 @@ class _LocalVLLMDeploymentHandler:
 
         # If that didn't work, let's deploy and wait for servers to come online.
         self.deploy_servers()
-        server_start_time = time.time()
-        while time.time() - server_start_time < 600:
+        server_start_time = time.perf_counter()
+        while time.perf_counter() - server_start_time < 600:
             time.sleep(10)
             healthy_ports = self.get_healthy_ports()
             if len(healthy_ports) == self.num_servers:
@@ -1953,7 +1955,7 @@ class ClaudeModel(EndpointModel, KeyBasedAuthMixIn):
             return {"messages": messages}
 
     def get_response(self, request):
-        start_time = time.time()
+        start_time = time.perf_counter()
         completion = self.client.messages.create(
             model=self.model_name,
             **request,
@@ -1961,7 +1963,7 @@ class ClaudeModel(EndpointModel, KeyBasedAuthMixIn):
             top_p=self.top_p,
             max_tokens=self.max_tokens,
         )
-        end_time = time.time()
+        end_time = time.perf_counter()
         model_output = completion.content[0].text
         response_time = end_time - start_time
         response_dict = {
@@ -1997,7 +1999,7 @@ class ClaudeReasoningModel(ClaudeModel):
         if self.top_p is not None:
             logging.warning("top_p is not supported for claude reasoning models as of 03/08/2025. It will be ignored.")
 
-        start_time = time.time()
+        start_time = time.perf_counter()
         thinking = {"type": "enabled", "budget_tokens": self.thinking_budget} if self.thinking_enabled else None
         completion = self.client.messages.create(
             model=self.model_name,
@@ -2006,7 +2008,7 @@ class ClaudeReasoningModel(ClaudeModel):
             thinking=thinking,
             max_tokens=self.max_tokens,
         )
-        end_time = time.time()
+        end_time = time.perf_counter()
 
         # Loop through completion.content to find the text output
         for content in completion.content:

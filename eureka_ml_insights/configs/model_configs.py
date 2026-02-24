@@ -9,6 +9,7 @@ from eureka_ml_insights.models import (
     DirectOpenAIModel,
     DirectOpenAIOModel,
     GeminiModel,
+    HuggingFaceModelMM,
     LlamaServerlessAzureRestEndpointModel,
     LLaVAHuggingFaceModel,
     LLaVAModel,
@@ -281,20 +282,6 @@ PHI4_HF_CONFIG = ModelConfig(
     },
 )
 
-QWEN3_VL_4B_INSTRUCT_HF_CONFIG = ModelConfig(
-    Qwen3VLHFModel,
-    {
-        "model_name": "Qwen/Qwen3-VL-4B-Instruct",
-    },
-)
-
-QWEN3_VL_8B_INSTRUCT_HF_CONFIG = ModelConfig(
-    Qwen3VLHFModel,
-    {
-        "model_name": "Qwen/Qwen3-VL-8B-Instruct",
-    },
-)
-
 # Llama models
 
 LLAMA3_1_70B_INSTRUCT_CONFIG = ModelConfig(
@@ -362,7 +349,20 @@ QWQ32B_LOCAL_CONFIG = ModelConfig(
 
 ####
 
-GEMMA3_12B_IT_CONFIG = ModelConfig(
+PHI4_RV_15B_4K_CONFIG = ModelConfig(
+    LocalVLLMModel,
+    {
+        # this name must match the vllm deployment name/path
+        "model_name": "neel-p0-phi4mm-14b-multi-16k-0220-r-rai-6phvq-checkpoints-checkpoint-1687-chat-template-hybrid",
+        # specify ports in case the model is already deployed
+        "max_concurrent": 1,
+        "max_tokens": 4096,
+        "temperature": 0.0,
+        "ports": ["9000"],
+    },
+)
+
+GEMMA3_12B_IT_4K_CONFIG = ModelConfig(
     LocalVLLMModel,
     {
         # this name must match the vllm deployment name/path
@@ -372,20 +372,44 @@ GEMMA3_12B_IT_CONFIG = ModelConfig(
         "max_tokens": 4096,
         "top_p": 0.95,        
         "temperature": 1.0,
-        "ports": ["8008"],
+        "ports": ["9000"],
     },
 )
 
-KIMIVL_3B_INSTRUCT_512_CONFIG = ModelConfig(
-    LocalVLLMModel,
+
+KIMIVL_3B_INSTRUCT_HF_4K_CONFIG = ModelConfig(
+    HuggingFaceModelMM,
     {
-        # this name must match the vllm deployment name/path
         "model_name": "moonshotai/Kimi-VL-A3B-Instruct",
-        "max_concurrent": 1,
-        "max_tokens": 512,
-        "temperature": 0,
-        "ports": ["8008"],        
-    }
+        "max_tokens": 4096,
+        "temperature": 0.0,
+        "do_sample": False,
+        "use_flash_attn": True,
+    },
+)
+
+KIMIVL_3B_THINKING_HF_4K_CONFIG = ModelConfig(
+    HuggingFaceModelMM,
+    {
+        "model_name": "moonshotai/Kimi-VL-A3B-Thinking-2506",
+        "max_tokens": 4096,
+        "temperature": 0.8,
+        "top_p": 0.95,
+        "do_sample": True,
+        "use_flash_attn": True,
+    },
+)
+
+KIMIVL_3B_THINKING_HF_32K_CONFIG = ModelConfig(
+    HuggingFaceModelMM,
+    {
+        "model_name": "moonshotai/Kimi-VL-A3B-Thinking-2506",
+        "max_tokens": 32768,
+        "temperature": 0.8,
+        "top_p": 0.95,
+        "do_sample": True,
+        "use_flash_attn": True,
+    },
 )
 
 KIMIVL_3B_INSTRUCT_4K_CONFIG = ModelConfig(
@@ -396,7 +420,7 @@ KIMIVL_3B_INSTRUCT_4K_CONFIG = ModelConfig(
         "max_concurrent": 1,
         "max_tokens": 4096,
         "temperature": 0,
-        "ports": ["8008"],        
+        "ports": ["9002"],        
     },
 )
 
@@ -409,7 +433,7 @@ KIMIVL_3B_THINKING_4K_CONFIG = ModelConfig(
         "max_tokens": 4096,
         "temperature": 0.8,
         "trust_remote_code": True,
-        "ports": ["8008"],        
+        "ports": ["9003"],        
     },
 )
 
@@ -422,9 +446,70 @@ KIMIVL_3B_THINKING_32K_CONFIG = ModelConfig(
         "max_tokens": 32768,
         "temperature": 0.8,
         "trust_remote_code": True,
-        "ports": ["8008"],        
+        "ports": ["9003"],        
     },
 )
+
+QWEN3_VL_8B_INSTRUCT_HF_4K_CONFIG = ModelConfig(
+    Qwen3VLHFModel,
+    {
+        "model_name": "Qwen/Qwen3-VL-8B-Instruct",
+        "top_p": 0.8,
+        "top_k": 20,
+        "temperature": 0.7,
+        "repetition_penalty": 1.0,
+        "max_tokens": 4096,
+    },
+)
+
+QWEN3_VL_8B_INSTRUCT_HF_32K_CONFIG = ModelConfig(
+    Qwen3VLHFModel,
+    {
+        "model_name": "Qwen/Qwen3-VL-8B-Instruct",
+        "top_p": 0.8,
+        "top_k": 20,
+        "temperature": 0.7,
+        "repetition_penalty": 1.0,
+        "max_tokens": 32768,
+    },
+)
+
+QWEN3_VL_8B_THINKING_HF_4K_CONFIG = ModelConfig(
+    Qwen3VLHFModel,
+    {
+        "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "temperature": 0.6,           
+        "max_tokens": 32768,
+    },
+)
+
+QWEN3_VL_8B_THINKING_HF_32K_CONFIG = ModelConfig(
+    Qwen3VLHFModel,
+    {
+        "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "temperature": 0.6,           
+        "max_tokens": 32768,
+    },
+)
+
+QWEN3_VL_8B_THINKING_HF_40K_CONFIG = ModelConfig(
+    Qwen3VLHFModel,
+    {
+        "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "temperature": 0.6,           
+        "max_tokens": 40960,
+    },
+)
+
 
 QWEN3_VL_8B_INSTRUCT_4K_CONFIG = ModelConfig(
     LocalVLLMModel,
@@ -439,24 +524,7 @@ QWEN3_VL_8B_INSTRUCT_4K_CONFIG = ModelConfig(
         "repetition_penalty": 1.0,
         "presence_penalty": 1.5,        
         "max_tokens": 4096,
-        "ports": ["8008"],        
-    },
-)
-
-QWEN3_VL_8B_INSTRUCT_16K_CONFIG = ModelConfig(
-    LocalVLLMModel,
-    {
-        # this name must match the vllm deployment name/path
-        "model_name": "Qwen/Qwen3-VL-8B-Instruct",
-        "max_concurrent": 1,
-        "seed": 3407,
-        "top_p": 0.8,
-        "top_k": 20,
-        "temperature": 0.7,
-        "repetition_penalty": 1.0,
-        "presence_penalty": 1.5,        
-        "max_tokens": 16384,
-        "ports": ["8008"],        
+        "ports": ["9000"],        
     },
 )
 
@@ -472,7 +540,7 @@ QWEN3_VL_8B_INSTRUCT_32K_CONFIG = ModelConfig(
         "temperature": 0.7,
         "repetition_penalty": 1.0,
         "presence_penalty": 1.5,
-        "ports": ["8008"],        
+        "ports": ["9000"],        
     },
 )
 
@@ -489,23 +557,7 @@ QWEN3_VL_8B_THINKING_4K_CONFIG = ModelConfig(
         "presence_penalty": 0.0,
         "temperature": 0.6,           
         "max_tokens": 4096,
-        "ports": ["8008"],        
-    },
-)
-
-QWEN3_VL_8B_THINKING_16K_CONFIG = ModelConfig(
-    LocalVLLMModel,
-    {
-        # this name must match the vllm deployment name/path
-        "model_name": "Qwen/Qwen3-VL-8B-Thinking",
-        "max_concurrent": 1,
-        "seed": 1234,
-        "top_p": 0.95,
-        "top_k": 20,
-        "repetition_penalty": 1.0,
-        "presence_penalty": 0.0,
-        "temperature": 0.6,
-        "ports": ["8008"],        
+        "ports": ["9001"],        
     },
 )
 
@@ -522,7 +574,7 @@ QWEN3_VL_8B_THINKING_32K_CONFIG = ModelConfig(
         "presence_penalty": 0.0,
         "temperature": 0.6,           
         "max_tokens": 32768,
-        "ports": ["8008"],        
+        "ports": ["9001"],        
     },
 )
 
@@ -539,7 +591,7 @@ QWEN3_VL_8B_THINKING_40K_CONFIG = ModelConfig(
         "presence_penalty": 0.0,
         "temperature": 0.6,           
         "max_tokens": 40960,
-        "ports": ["8008"],        
+        "ports": ["9001"],        
     },
 )
 
