@@ -454,10 +454,12 @@ QWEN3_VL_8B_INSTRUCT_HF_4K_CONFIG = ModelConfig(
     Qwen3VLHFModel,
     {
         "model_name": "Qwen/Qwen3-VL-8B-Instruct",
+        "seed": 3407,
         "top_p": 0.8,
         "top_k": 20,
         "temperature": 0.7,
         "repetition_penalty": 1.0,
+        "presence_penalty": 1.5,        
         "max_tokens": 4096,
     },
 )
@@ -466,10 +468,12 @@ QWEN3_VL_8B_INSTRUCT_HF_32K_CONFIG = ModelConfig(
     Qwen3VLHFModel,
     {
         "model_name": "Qwen/Qwen3-VL-8B-Instruct",
+        "seed": 3407,
         "top_p": 0.8,
         "top_k": 20,
         "temperature": 0.7,
         "repetition_penalty": 1.0,
+        "presence_penalty": 1.5,
         "max_tokens": 32768,
     },
 )
@@ -478,9 +482,11 @@ QWEN3_VL_8B_THINKING_HF_4K_CONFIG = ModelConfig(
     Qwen3VLHFModel,
     {
         "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+        "seed": 1234,
         "top_p": 0.95,
         "top_k": 20,
         "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
         "temperature": 0.6,           
         "max_tokens": 32768,
     },
@@ -490,9 +496,11 @@ QWEN3_VL_8B_THINKING_HF_32K_CONFIG = ModelConfig(
     Qwen3VLHFModel,
     {
         "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+        "seed": 1234,
         "top_p": 0.95,
         "top_k": 20,
         "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
         "temperature": 0.6,           
         "max_tokens": 32768,
     },
@@ -502,14 +510,85 @@ QWEN3_VL_8B_THINKING_HF_40K_CONFIG = ModelConfig(
     Qwen3VLHFModel,
     {
         "model_name": "Qwen/Qwen3-VL-8B-Thinking",
+        "seed": 1234,
         "top_p": 0.95,
         "top_k": 20,
         "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
         "temperature": 0.6,           
         "max_tokens": 40960,
     },
 )
 
+QWEN3_VL_32B_INSTRUCT_HF_4K_CONFIG = ModelConfig(
+    Qwen3VLHFModel,
+    {
+        "model_name": "Qwen/Qwen3-VL-32B-Instruct",
+        "seed": 3407,
+        "top_p": 0.8,
+        "top_k": 20,
+        "temperature": 0.7,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 1.5,        
+        "max_tokens": 4096,
+    },
+)
+
+QWEN3_VL_32B_INSTRUCT_HF_32K_CONFIG = ModelConfig(
+    Qwen3VLHFModel,
+    {
+        "model_name": "Qwen/Qwen3-VL-32B-Instruct",
+        "seed": 3407,
+        "top_p": 0.8,
+        "top_k": 20,
+        "temperature": 0.7,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 1.5,
+        "max_tokens": 32768,
+    },
+)
+
+QWEN3_VL_32B_THINKING_HF_4K_CONFIG = ModelConfig(
+    Qwen3VLHFModel,
+    {
+        "model_name": "Qwen/Qwen3-VL-32B-Thinking",
+        "seed": 1234,
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
+        "temperature": 0.6,           
+        "max_tokens": 32768,
+    },
+)
+
+QWEN3_VL_32B_THINKING_HF_32K_CONFIG = ModelConfig(
+    Qwen3VLHFModel,
+    {
+        "model_name": "Qwen/Qwen3-VL-32B-Thinking",
+        "seed": 1234,
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
+        "temperature": 0.6,           
+        "max_tokens": 32768,
+    },
+)
+
+QWEN3_VL_32B_THINKING_HF_40K_CONFIG = ModelConfig(
+    Qwen3VLHFModel,
+    {
+        "model_name": "Qwen/Qwen3-VL-32B-Thinking",
+        "seed": 1234,
+        "top_p": 0.95,
+        "top_k": 20,
+        "repetition_penalty": 1.0,
+        "presence_penalty": 0.0,
+        "temperature": 0.6,           
+        "max_tokens": 40960,
+    },
+)
 
 QWEN3_VL_8B_INSTRUCT_4K_CONFIG = ModelConfig(
     LocalVLLMModel,

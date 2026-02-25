@@ -995,6 +995,7 @@ class HuggingFaceModel(Model):
     apply_model_template: bool = True
     repetition_penalty: float = 1.0
     presence_penalty: float = 0.0
+    seed: int = 0
 
     quantize: bool = False
     use_flash_attn: bool = False
@@ -1099,7 +1100,7 @@ class HuggingFaceModel(Model):
             response_dict.update(
                 {
                     "is_valid": is_valid,
-                    "n_output_tokens": self.count_tokens(response_dict["model_output"], is_valid),
+                    "n_output_tokens": self.count_tokens(response_dict.get("model_output"), is_valid),
                 }
             )
         else:
@@ -1148,8 +1149,12 @@ class HuggingFaceModelMM(HuggingFaceModel):
         self.processor = AutoProcessor.from_pretrained(self.model_name, trust_remote_code=True)
 
     def _generate(self, text_prompt, query_images=None):
-        inputs = self.processor(text=text_prompt, images=query_images, return_tensors="pt").to(self.device)
-        
+        inputs = self.processor(text=text_prompt, images=query_images, return_tensors="pt")
+
+        # Move to model's device (needed when using device_map="auto")
+        target_device = self.model.device if hasattr(self.model, "device") else self.device
+        inputs = {k: v.to(target_device) for k, v in inputs.items()}
+
         start_time = time.perf_counter()
         try:
             output_ids = self.model.generate(
@@ -1162,7 +1167,7 @@ class HuggingFaceModelMM(HuggingFaceModel):
         except Exception as e:
             logging.warning(e)
             return None
-                    
+
         end_time = time.perf_counter()
         sequence_length = inputs["input_ids"].shape[1]
         new_output_ids = output_ids[:, sequence_length:]
@@ -2032,15 +2037,67 @@ class ClaudeReasoningModel(ClaudeModel):
 
 
 @dataclass
+class KimiVLHuggingFaceModel(HuggingFaceModelMM):
+    """This class is used to run Kimi-VL via HuggingFace apis."""
+
+    def __post_init__(self):
+        super().__post_init__()
+        if "Kimi-VL" not in self.model_name:
+            logging.warning(
+                "This model class applies a template to the prompt that is specific to Kimi-VL models "
+                "but your model is not a Kimi-VL model."
+            )
+
+    def get_model(self):
+        import torch
+        from transformers import AutoModelForCausalLM, AutoProcessor
+
+        # Use bfloat16 with flash attention for better compatibility
+        if self.use_flash_attn:
+            torch_dtype = torch.bfloat16
+            device_map = "auto"
+            attn_implementation = "flash_attention_2"
+        else:
+            torch_dtype = torch.float16
+            device_map = self.device
+            attn_implementation = None
+
+        model_kwargs = {
+            "torch_dtype": torch_dtype,
+            "device_map": device_map,
+            "trust_remote_code": True,
+        }
+
+        if attn_implementation:
+            model_kwargs["attn_implementation"] = attn_implementation
+
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.model_name,
+            **model_kwargs
+        )
+
+        self.processor = AutoProcessor.from_pretrained(self.model_name, trust_remote_code=True)
+
+    def model_template_fn(self, text_prompt, system_message=None, num_images=None):
+        messages = []
+        if system_message:
+            messages.append({"role": "system", "content": system_message})
+        messages.append({"role": "user", "content": text_prompt})
+
+        text_prompt = self.processor.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+            return_dict=False,
+        )
+
+        return text_prompt
+
+
+@dataclass
 class TestModel(Model):
     # This class is used for testing purposes only. It only waits for a specified time and returns a response.
 
     def generate(self, text_prompt, **kwargs):
         output = "This is a test response."
         is_valid = True
-        return {
-            "model_output": output,
-            "is_valid": is_valid,
-            "response_time": 0.1,
-            "n_output_tokens": self.count_tokens(output, is_valid),
-        }
