@@ -1165,7 +1165,7 @@ class HuggingFaceModelMM(HuggingFaceModel):
                 do_sample=self.do_sample,
             )
         except Exception as e:
-            logging.warning(e)
+            logging.warning(f"_generate failed: {type(e).__name__}: {e}", exc_info=True)
             return None
 
         end_time = time.perf_counter()
@@ -2082,9 +2082,15 @@ class KimiVLHuggingFaceModel(HuggingFaceModelMM):
         messages = []
         if system_message:
             messages.append({"role": "system", "content": system_message})
-        messages.append({"role": "user", "content": text_prompt})
 
-        text_prompt = self.processor.tokenizer.apply_chat_template(
+        if num_images:
+            content = [{"type": "image"} for _ in range(num_images)]
+            content.append({"type": "text", "text": text_prompt})
+        else:
+            content = text_prompt
+        messages.append({"role": "user", "content": content})
+
+        text_prompt = self.processor.apply_chat_template(
             messages,
             tokenize=False,
             add_generation_prompt=True,

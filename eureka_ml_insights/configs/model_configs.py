@@ -22,8 +22,8 @@ from eureka_ml_insights.models import (
     TestModel,
     OfflineFileModel,
     Qwen3VLHFModel,
+    KimiVLHuggingFaceModel
 )
-from eureka_ml_insights.models.models import AzureOpenAIModel
 
 from .config import ModelConfig
 
@@ -378,18 +378,18 @@ GEMMA3_12B_IT_4K_CONFIG = ModelConfig(
 
 
 KIMIVL_3B_INSTRUCT_HF_4K_CONFIG = ModelConfig(
-    HuggingFaceModelMM,
+    KimiVLHuggingFaceModel,
     {
         "model_name": "moonshotai/Kimi-VL-A3B-Instruct",
         "max_tokens": 4096,
-        "temperature": 0.0,
-        "do_sample": False,
+        "temperature": 0.2,
+        "do_sample": True,
         "use_flash_attn": True,
     },
 )
 
 KIMIVL_3B_THINKING_HF_4K_CONFIG = ModelConfig(
-    HuggingFaceModelMM,
+    KimiVLHuggingFaceModel,
     {
         "model_name": "moonshotai/Kimi-VL-A3B-Thinking-2506",
         "max_tokens": 4096,
@@ -401,7 +401,7 @@ KIMIVL_3B_THINKING_HF_4K_CONFIG = ModelConfig(
 )
 
 KIMIVL_3B_THINKING_HF_32K_CONFIG = ModelConfig(
-    HuggingFaceModelMM,
+    KimiVLHuggingFaceModel,
     {
         "model_name": "moonshotai/Kimi-VL-A3B-Thinking-2506",
         "max_tokens": 32768,
