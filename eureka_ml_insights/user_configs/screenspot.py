@@ -45,7 +45,7 @@ class SCREENSPOT_NORMALIZED_PIPELINE(ExperimentConfig):
         data_reader_config=DataSetConfig(
             DataReader,
             {
-                "path": "/data/datasets/EVAL/ScreenSpot/screenspot_all.jsonl",                
+                "path": "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/screenspot_all.jsonl",
                 "transform": SequenceTransform(transforms),
             },
         ),
@@ -64,7 +64,7 @@ class SCREENSPOT_NORMALIZED_PIPELINE(ExperimentConfig):
                 MMDataLoader,
                 {
                     "path": os.path.join(self.data_processing_comp.output_dir, "transformed_data.jsonl"),
-                    "mm_data_path_prefix": "/data/datasets/EVAL/ScreenSpot/images",
+                    "mm_data_path_prefix": "/mnt/phimmwestus3_datasets/EVAL/ScreenSpot/images",
                  },
             ),
             output_dir=os.path.join(self.log_dir, "inference_result"),
